@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>move image demo</title>
+<meta name="viewport" content="width=device-width"/>
+<script src="/javascripts/jquery-1.7.1.min.js"></script>
+<script src="/javascripts/jquery.mobile-1.1.0-rc.1.min.js"></script>
+<script src="/nowjs/now.js"></script>
+
+<style type="text/css">
+  html, body {
+  margin: 0;
+  height: 100% ;
+  overflow: hidden ;
+  width: 100% ;
+}
+img {
+  position: absolute ;
+}
+</style>
+
+<script>
+$(document).ready(function(){
+  var image = $('#image');
+  var body = $('body');
+     
+  // mouse down event
+  image.bind('vmousedown', function(event){
+    event.preventDefault();
+
+    var localOffset = {
+      x: (event.pageX - image.position().left),
+      y: (event.pageY - image.position().top)
+    };
+                                   
+    // mouse move event
+    body.bind('vmousemove', function(event){
+  
+      var newPosition = {
+        left: (event.pageX - localOffset.x),
+        top: (event.pageY - localOffset.y)
+      };
+                                                                                           
+      // update image position locally
+      image.css(newPosition);
+
+      // definied on server - called from client
+      now.syncPosition(newPosition);
+    });
+  });
+   
+  // mouse up event
+  image.bind('vmouseup', function(event){
+    body.unbind('vmousemove');
+  });
+   
+   
+  // definied on client - called from server
+  now.updatePosition = function(newPosition){
+    image.css(newPosition);   
+  };
+});
+</script>
+
+</head>
+<body>
+  <img id="image" src="/images/icon.png" />
+</body>
+</html>
